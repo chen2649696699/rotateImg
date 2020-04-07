@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div style="margin-top:20px;text-align:center;page-break-before: always">
+        <img id="testImg" style="width:500px;" src="http://183.230.71.65:9020/WebFiles/%E5%B7%A5%E4%BD%9C%E4%BA%BA%E5%91%98%E7%A1%AE%E8%AE%A4%E8%B5%84%E6%96%99/2020-04-01/cab2b2fd-d087-456b-8adc-80450dfdec18.jpg"  onclick="rotateImg('testImg', 'right','http:\/\/183.230.71.65:9020/WebFiles/%E5%B7%A5%E4%BD%9C%E4%BA%BA%E5%91%98%E7%A1%AE%E8%AE%A4%E8%B5%84%E6%96%99/2020-04-01/cab2b2fd-d087-456b-8adc-80450dfdec18.jpg')" />
+    </div>
+    <script>
+        //需要在后端设置图片跨域
+        function rotateImg(pid, direction, src) {
+            //最小与最大旋转方向，图片旋转4次后回到原方向  
+            var min_step = 0;
+            var max_step = 3;
+            var img1 = document.getElementById(pid);
+            var img = new Image();
+            img.crossOrigin = "anonymous"; //关键
+            img.onload = function () {
+                if (img == null) return;
+                //img的高度和宽度不能在img元素隐藏后获取，否则会出错  
+                var height = img.height;
+                var width = img.width;
+                console.log(height, width)
+                var step = img1.getAttribute('step');
+                console.log(width)
+                if (step == null) {
+                    step = min_step;
+                }
+                if (direction == 'right') {
+                    step++;
+                    //旋转到原位置，即超过最大值  
+                    step > max_step && (step = min_step);
+                } else {
+                    step--;
+                    step < min_step && (step = max_step);
+                }
+                img1.setAttribute('step', step);
+                var canvas = document.createElement('canvas');;
+                if (canvas == null) {
+                    img.style.display = 'none';
+                    canvas = document.getElementById('canvas');
+                    canvas.setAttribute('id', 'pic_' + pid);
+                }
+                //旋转角度以弧度值为参数  
+                var degree = step * 90 * Math.PI / 180;
+                var ctx = canvas.getContext('2d');
+                switch (step) {
+                    case 0:
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0);
+                        var img_src = canvas.toDataURL();
+                        img1.src = img_src
+                        img1.style.width = '500px';
+                        img1.style.height = 'auto';
+                        break;
+                    case 1:
+                        console.log(canvas.width, canvas.height)
+
+                        canvas.width = height;
+                        canvas.height = width;
+                        ctx.rotate(degree);
+                        ctx.drawImage(img, 0, -height);
+                        var img_src = canvas.toDataURL();
+                        img1.src = img_src
+                        img1.style.height = '500px';
+                        img1.style.width = 'auto';
+                        break;
+                    case 2:
+                        console.log(canvas.width, canvas.height)
+                        canvas.style.width = canvas.height;
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.rotate(degree);
+                        ctx.drawImage(img, -width, -height);
+                        var img_src = canvas.toDataURL();
+                        img1.src = img_src
+                        img1.style.width = '500px';
+                        img1.style.height = 'auto';
+                        break;
+                    case 3:
+                        canvas.width = height;
+                        canvas.height = width;
+                        ctx.rotate(degree);
+                        ctx.drawImage(img, -width, 0);
+                        var img_src = canvas.toDataURL();
+                        img1.src = img_src
+                        img1.style.height = '500px';
+                        img1.style.width = 'auto';
+                        break;
+                }
+            }
+            img.src = src + '?v=' + Math.random()
+        }  
+    </script>
+</body>
+
+</html>
